@@ -1,8 +1,13 @@
 from flask import Flask
 from flask_restful import Resource, Api
+from secure_check import authenticate, identity
+from flask_jwt import JWT, jwt_required
 
 app = Flask(__name__)
+app.config['SECRET_KEY'] = 'mysecretkey'
+
 api = Api(app)
+jwt = JWT(app, authenticate, identity)
 
 players = []
 
@@ -34,6 +39,7 @@ class PlayerNames(Resource):
 
 class AllNames(Resource):
 
+    @jwt_required()
     def get(self):
         return {'players': players}
 
@@ -42,5 +48,6 @@ api.add_resource(AllNames, '/players')
 
 if __name__ == '__main__':
     app.run(debug=True)
+
 
 
