@@ -54,19 +54,19 @@ class PlayerNames(Resource):
 
     def delete(self, name):
         
-        for ind,player in enumerate(players):
-            if player['name'] == name: 
-                deleted_player = players.pop(ind)
-                print(deleted_player)
-                return {'note' : 'delete successful'}
+        player = Player.query.filter_by(name=name).first()
+        db.session.delete(player)
+        db.session.commit()
 
-        return {'name': None}
+        return {'note': 'delete successful'}
 
 class AllNames(Resource):
 
-    @jwt_required()
+    # @jwt_required()
     def get(self):
-        return {'players': players}
+        players = Player.query.all()
+
+        return [player.json() for player in players]
 
 api.add_resource(PlayerNames, '/player/<string:name>')
 api.add_resource(AllNames, '/players')
